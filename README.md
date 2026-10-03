@@ -1,10 +1,14 @@
 # Vidya Setu Education website
 
-A responsive static website for a teacher-training institute, built with plain HTML, CSS, and JavaScript. It does not need a build step.
+A responsive static website for a teacher-training institute, built with plain HTML, CSS, and JavaScript. It has no application build step; a small Node.js script generates the gallery image list.
 
 ## Run locally
 
-Open `index.html` in a browser, or serve the `school-website` folder with any static file server.
+Generate the gallery image list and serve the `school-website` folder with any static file server:
+
+```sh
+node scripts/generate-gallery-manifest.js
+```
 
 ## Project structure
 
@@ -12,23 +16,23 @@ Open `index.html` in a browser, or serve the `school-website` folder with any st
 school-website/
 ├── index.html
 ├── firebase.json
+├── assets/
+│   ├── gallery-images.json
+│   ├── gallery/
+│   │   └── README.md
+│   └── images/
+│       └── ...
+├── scripts/
+│   └── generate-gallery-manifest.js
 ├── css/
 │   └── styles.css
 ├── js/
 │   └── main.js
-└── assets/
-    ├── gallery/
-    │   └── README.md
-    └── images/
-        ├── photo-01.JPG
-        ├── photo-02.jpg.JPG
-        ├── photo-03.jpg.JPG
-        └── photo-04.jpg.JPG
 ```
 
 ## Add gallery photos
 
-The gallery currently uses the four photos in `assets/images/`. Keep the filenames and letter case exactly as shown in the project tree, or update the matching `src` paths in `index.html`. Image paths are case-sensitive on the hosting server. Update each image's `alt` text in `index.html` to describe the photo. See `assets/gallery/README.md` for more guidance.
+Add `.jpg`, `.jpeg`, `.JPG`, or `.JPEG` files to `assets/images/`. The gallery image list is generated automatically during GitHub deployments, so no HTML changes are needed. To include new photos when running locally, run `node scripts/generate-gallery-manifest.js` again before serving the site. See `assets/gallery/README.md` for more guidance.
 
 ## Host on Google Cloud with Firebase Hosting
 
