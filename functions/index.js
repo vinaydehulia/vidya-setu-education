@@ -92,7 +92,7 @@ exports.submitFeedback = onCall(async (request) => {
     await bigQuery
       .dataset(datasetId)
       .table("vse_feedback_table")
-      .insert([{ insertId: submissionId, json: row }]);
+      .insert(row);
   } catch (error) {
     const rowErrors = Array.isArray(error?.errors)
       ? error.errors.flatMap((rowError) => (
