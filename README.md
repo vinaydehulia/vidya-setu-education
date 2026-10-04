@@ -100,7 +100,7 @@ The form requires a Firebase project with billing enabled: deploying Firebase Cl
    On first deployment, provide your dataset ID when prompted for `BIGQUERY_DATASET`.
 5. Test on the Firebase Hosting URL by signing in with Google, completing the enquiry form, and confirming the row appears in `vse_bq_dataset.vse_feedback_table`.
 
-The existing GitHub Actions workflow deploys Hosting only. Deploy Cloud Functions with the Firebase CLI after changing `functions/`; CI deployment for functions needs separate setup and appropriate Google Cloud IAM permissions. Serving the site from a plain local static server does not provide the Firebase reserved SDK initialization endpoints or a deployed function, so form submissions require Firebase Hosting and the deployed backend.
+Serving the site from a plain local static server does not provide the Firebase reserved SDK initialization endpoints or a deployed function, so form submissions require Firebase Hosting and the deployed backend.
 
 ## Deploy automatically from GitHub
 
@@ -109,3 +109,12 @@ The GitHub Actions workflow deploys to the live Firebase Hosting channel wheneve
 1. In the Firebase console, open **Project settings > Service accounts** for the `vidya-setu-education` project and generate a private key for a service account with Firebase Hosting deployment permissions.
 2. In the GitHub repository, open **Settings > Secrets and variables > Actions** and add a repository secret named `FIREBASE_SERVICE_ACCOUNT_VIDYA_SETU_EDUCATION`. Set its value to the full contents of the downloaded service-account JSON file. Keep this key private and do not commit it to the repository.
 3. Push a change to `main`. Check the **Actions** tab in GitHub to see the deployment status.
+
+## Deploy Cloud Functions from GitHub Actions
+
+The `Deploy Firebase Functions` workflow deploys functions only when a push to `main` changes `functions/**`, `firebase.json`, or the workflow itself. It installs dependencies from the committed lockfile and deploys with Node.js 22.
+
+1. Create a deployer service account in the linked Google Cloud project. Grant it the permissions needed to deploy 2nd-gen Cloud Functions and act as the function runtime service account, including Cloud Functions Admin, Cloud Build Editor, and Service Account User. Depending on the project's IAM setup, deployment can also require Cloud Run and Artifact Registry permissions.
+2. Create a JSON key for that deployer account and add its full contents as the GitHub Actions repository secret `FIREBASE_FUNCTIONS_SERVICE_ACCOUNT_VIDYA_SETU_EDUCATION`. Keep the key private. This secret is separate from the Hosting deploy secret above.
+3. In **Settings > Secrets and variables > Actions > Variables**, create the repository variable `BIGQUERY_DATASET` with value `vse_bq_dataset`. The workflow writes it to a temporary project-specific Functions environment file during deployment; the dataset ID is configuration, not a secret.
+4. Push a function-related change to `main` and check the **Actions** tab for the deployment result.

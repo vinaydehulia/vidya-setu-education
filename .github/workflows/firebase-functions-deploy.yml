@@ -1,0 +1,48 @@
+name: Deploy Firebase Functions
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "functions/**"
+      - "firebase.json"
+      - ".github/workflows/firebase-functions-deploy.yml"
+
+permissions:
+  contents: read
+
+env:
+  BIGQUERY_DATASET: ${{ vars.BIGQUERY_DATASET }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_FUNCTIONS_SERVICE_ACCOUNT_VIDYA_SETU_EDUCATION }}
+
+      - name: Install function dependencies
+        working-directory: functions
+        run: npm ci
+
+      - name: Configure BigQuery dataset
+        shell: bash
+        run: |
+          if [[ -z "$BIGQUERY_DATASET" ]]; then
+            echo "Set the BIGQUERY_DATASET Actions variable to vse_bq_dataset." >&2
+            exit 1
+          fi
+          printf 'BIGQUERY_DATASET=%s\n' "$BIGQUERY_DATASET" > functions/.env.vidya-setu-education
+
+      - name: Deploy Cloud Functions
+        run: npx --yes firebase-tools deploy --only functions --project vidya-setu-education --non-interactive
