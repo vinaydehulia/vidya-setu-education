@@ -4,7 +4,7 @@ const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { defineString } = require("firebase-functions/params");
 
 const bigQueryDataset = defineString("BIGQUERY_DATASET");
-const bigQuery = new BigQuery();
+const bigQuery = new BigQuery({ projectId: "vidya-setu-education" });
 const allowedPrograms = new Set([
   "teaching-foundations",
   "classroom-practice",
