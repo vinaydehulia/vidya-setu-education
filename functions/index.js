@@ -94,7 +94,22 @@ exports.submitFeedback = onCall(async (request) => {
       .table("vse_feedback_table")
       .insert([{ insertId: submissionId, json: row }]);
   } catch (error) {
-    console.error("Could not write enquiry to BigQuery.", error);
+    const rowErrors = Array.isArray(error?.errors)
+      ? error.errors.flatMap((rowError) => (
+        Array.isArray(rowError.errors) ? rowError.errors : []
+      ))
+      : [];
+    const insertErrors = rowErrors.map(({ reason, location, message: errorMessage }) => ({
+      reason,
+      location,
+      message: errorMessage
+    }));
+
+    console.error("Could not write enquiry to BigQuery.", {
+      code: error?.code,
+      message: error?.message,
+      insertErrors
+    });
     throw new HttpsError("internal", "Your enquiry could not be saved. Please try again.");
   }
 
