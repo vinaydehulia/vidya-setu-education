@@ -85,7 +85,8 @@ exports.submitFeedback = onCall(async (request) => {
     sirname: surname,
     phone_no: phoneNumber,
     email_id: email,
-    Query: query
+    Query: query,
+    Time: new Date().toISOString()
   };
 
   try {

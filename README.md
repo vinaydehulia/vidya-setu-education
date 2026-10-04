@@ -82,11 +82,12 @@ The form requires a Firebase project with billing enabled: deploying Firebase Cl
      sirname STRING,
      phone_no STRING,
      email_id STRING,
-     Query STRING
+     Query STRING,
+     Time TIMESTAMP
    );
    ```
 
-   The function writes the form's first name, surname, phone, and signed-in email to their matching columns. It combines the selected program and optional message into `Query`. If using a different project or dataset, adjust the table identifier and the `BIGQUERY_DATASET` function parameter.
+   The function writes the form's first name, surname, phone, and signed-in email to their matching columns. It combines the selected program and optional message into `Query`, and stores the submission timestamp in `Time`. BigQuery stores `TIMESTAMP` as an absolute instant; to display it in IST, use `FORMAT_TIMESTAMP('%F %T', Time, 'Asia/Kolkata')`. If using a different project or dataset, adjust the table identifier and the `BIGQUERY_DATASET` function parameter.
 3. Grant the deployed function's runtime service account the **BigQuery Data Editor** role on the dataset. Gen 2 functions use a runtime service account; check the function's runtime settings in Google Cloud Console to confirm which account is in use.
 4. Using Node.js 22 and the Firebase CLI, install the function dependencies and deploy the site and function:
 
