@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "index.html"
+      - "css/**"
+      - "js/**"
+      - "assets/**"
+      - "scripts/**"
+      - "firebase.json"
+      - ".github/workflows/firebase-hosting-deploy.yml"
 
 permissions:
   contents: read
