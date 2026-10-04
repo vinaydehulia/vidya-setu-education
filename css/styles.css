@@ -92,10 +92,21 @@ button:focus-visible {
   gap: 10px;
 }
 
-.brand-logo {
+.brand-logo-frame {
+  position: relative;
   display: block;
-  width: 128px;
-  height: 76px;
+  width: 176px;
+  height: 86px;
+  overflow: hidden;
+}
+
+.brand-logo {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  display: block;
+  width: 176px;
+  height: 176px;
   object-fit: cover;
   object-position: center;
 }
