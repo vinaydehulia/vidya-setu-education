@@ -1,0 +1,99 @@
+const { randomUUID } = require("node:crypto");
+const { BigQuery } = require("@google-cloud/bigquery");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { defineString } = require("firebase-functions/params");
+
+const bigQueryDataset = defineString("BIGQUERY_DATASET");
+const bigQuery = new BigQuery();
+const allowedPrograms = new Set([
+  "teaching-foundations",
+  "classroom-practice",
+  "professional-growth",
+  "other"
+]);
+
+function requireText(value, field, maxLength) {
+  if (typeof value !== "string") {
+    throw new HttpsError("invalid-argument", `The ${field} field is required.`);
+  }
+
+  const text = value.trim();
+  if (!text || text.length > maxLength) {
+    throw new HttpsError("invalid-argument", `The ${field} field is invalid.`);
+  }
+
+  return text;
+}
+
+function validatePhoneNumber(value) {
+  if (typeof value !== "string") {
+    throw new HttpsError("invalid-argument", "A valid phone number is required.");
+  }
+
+  const phoneNumber = value.replace(/[\s().-]/g, "");
+  if (!/^\+?[1-9]\d{7,14}$/.test(phoneNumber)) {
+    throw new HttpsError("invalid-argument", "A valid international phone number is required.");
+  }
+
+  return phoneNumber;
+}
+
+exports.submitFeedback = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Sign in before sending an enquiry.");
+  }
+
+  const email = request.auth.token.email;
+  if (typeof email !== "string" || !email || request.auth.token.email_verified !== true) {
+    throw new HttpsError("failed-precondition", "A verified email address is required.");
+  }
+
+  if (request.data?.consent !== true) {
+    throw new HttpsError("failed-precondition", "Consent is required to submit an enquiry.");
+  }
+
+  const fullName = requireText(request.data?.fullName, "name", 100);
+  const phoneNumber = validatePhoneNumber(request.data?.phoneNumber);
+  const program = requireText(request.data?.program, "program", 40);
+  if (!allowedPrograms.has(program)) {
+    throw new HttpsError("invalid-argument", "Choose a valid program.");
+  }
+
+  const feedback = request.data?.feedback;
+  if (feedback !== undefined && feedback !== null && typeof feedback !== "string") {
+    throw new HttpsError("invalid-argument", "The feedback field is invalid.");
+  }
+  const message = typeof feedback === "string" ? feedback.trim() : "";
+  if (message.length > 2000) {
+    throw new HttpsError("invalid-argument", "The feedback field is too long.");
+  }
+
+  const datasetId = bigQueryDataset.value();
+  if (!/^[A-Za-z0-9_]{1,1024}$/.test(datasetId)) {
+    throw new HttpsError("failed-precondition", "The BigQuery dataset is not configured correctly.");
+  }
+
+  const submissionId = randomUUID();
+  const row = {
+    submission_id: submissionId,
+    full_name: fullName,
+    phone_number: phoneNumber,
+    email,
+    program,
+    feedback: message,
+    consent_given: true,
+    created_at: new Date().toISOString()
+  };
+
+  try {
+    await bigQuery
+      .dataset(datasetId)
+      .table("user_feedback")
+      .insert([{ insertId: submissionId, json: row }]);
+  } catch (error) {
+    console.error("Could not write enquiry to BigQuery.", error);
+    throw new HttpsError("internal", "Your enquiry could not be saved. Please try again.");
+  }
+
+  return { success: true };
+});

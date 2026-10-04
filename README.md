@@ -2,6 +2,8 @@
 
 A responsive static website for a teacher-training institute, built with plain HTML, CSS, and JavaScript. It has no application build step; a small Node.js script generates the gallery image list.
 
+The enquiry form uses Firebase Authentication and a Firebase callable Cloud Function to save enquiries to BigQuery. Its email address comes from the signed-in Google account; BigQuery credentials are only used by the function, never by the browser.
+
 ## Run locally
 
 Generate the gallery image list and serve the `school-website` folder with any static file server:
@@ -24,6 +26,9 @@ school-website/
 │       └── ...
 ├── scripts/
 │   └── generate-gallery-manifest.js
+├── functions/
+│   ├── index.js
+│   └── package.json
 ├── css/
 │   └── styles.css
 ├── js/
@@ -62,6 +67,42 @@ Firebase Hosting is a straightforward Google Cloud option for this static site. 
 5. Open the `Hosting URL` printed by the command. To use your own domain, go to **Hosting** in the Firebase Console, choose **Add custom domain**, and follow the DNS verification steps.
 
 The included `firebase.json` serves this folder as the static site. Add your photos before deploying so they appear in the live gallery. Replace the example contact email in `index.html` with your real address.
+
+## Set up enquiry submissions
+
+The form requires a Firebase project with billing enabled: deploying Firebase Cloud Functions requires the Blaze plan, and BigQuery streaming inserts are not available in the no-billing sandbox/free tier. BigQuery storage and writes can incur usage-based charges. Review the Google Cloud pricing and quotas before enabling billing.
+
+1. In Firebase Console, enable **Authentication > Sign-in method > Google**. Add the deployed Hosting domain (and any custom domain) to the authorized domains.
+2. In the linked Google Cloud project, enable the BigQuery API and create a dataset. The function and dataset should be in the same project. Create the `user_feedback` table in that dataset with this schema:
+
+   ```sql
+   CREATE TABLE `PROJECT_ID.DATASET_ID.user_feedback` (
+     submission_id STRING NOT NULL,
+     full_name STRING NOT NULL,
+     phone_number STRING NOT NULL,
+     email STRING NOT NULL,
+     program STRING NOT NULL,
+     feedback STRING,
+     consent_given BOOL NOT NULL,
+     created_at TIMESTAMP NOT NULL
+   );
+   ```
+
+   Replace `PROJECT_ID` and `DATASET_ID` with the linked Firebase project ID and your chosen BigQuery dataset ID. The dataset name is supplied as the `BIGQUERY_DATASET` parameter when the function is deployed.
+3. Grant the deployed function's runtime service account the **BigQuery Data Editor** role on the dataset. Gen 2 functions use a runtime service account; check the function's runtime settings in Google Cloud Console to confirm which account is in use.
+4. Using Node.js 22 and the Firebase CLI, install the function dependencies and deploy the site and function:
+
+   ```sh
+   cd functions
+   npm install
+   cd ..
+   firebase deploy --only hosting,functions
+   ```
+
+   On first deployment, provide your dataset ID when prompted for `BIGQUERY_DATASET`.
+5. Test on the Firebase Hosting URL by signing in with Google, completing the enquiry form, and confirming the row appears in `DATASET_ID.user_feedback`.
+
+The existing GitHub Actions workflow deploys Hosting only. Deploy Cloud Functions with the Firebase CLI after changing `functions/`; CI deployment for functions needs separate setup and appropriate Google Cloud IAM permissions. Serving the site from a plain local static server does not provide the Firebase reserved SDK initialization endpoints or a deployed function, so form submissions require Firebase Hosting and the deployed backend.
 
 ## Deploy automatically from GitHub
 

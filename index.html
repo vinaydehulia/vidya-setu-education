@@ -6,6 +6,10 @@
     <meta name="description" content="Vidya Setu Education equips teachers with practical skills, confidence, and lifelong learning.">
     <title>Vidya Setu Education | Empowering Educators</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script defer src="/__/firebase/12.19.0/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/12.19.0/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/12.19.0/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/init.js"></script>
     <script src="js/main.js" defer></script>
   </head>
   <body>
@@ -157,8 +161,48 @@
         <div class="container contact-inner">
           <p class="eyebrow">Your teaching journey starts here</p>
           <h2>Grow your practice.<br><span>Inspire what’s next.</span></h2>
-          <p>Contact us to learn about training opportunities and upcoming programs.</p>
-          <a class="button button-primary" href="mailto:hello@vidyasetu.example">Contact Vidya Setu <span aria-hidden="true">↗</span></a>
+          <p>Tell us a little about yourself and the learning you’re interested in.</p>
+
+          <div class="enquiry-auth">
+            <p id="enquiry-auth-status" role="status" aria-live="polite">Checking your sign-in status…</p>
+            <button class="button button-primary" id="google-sign-in" type="button" hidden>Sign in with Google</button>
+            <button class="text-link" id="google-sign-out" type="button" hidden>Sign out</button>
+          </div>
+
+          <form class="enquiry-form" id="enquiry-form">
+            <label>
+              Your name
+              <input name="fullName" type="text" autocomplete="name" maxlength="100" required>
+            </label>
+            <label>
+              Phone number
+              <input name="phoneNumber" type="tel" autocomplete="tel" inputmode="tel" placeholder="+1 202 555 0123" required>
+            </label>
+            <label class="enquiry-form-wide">
+              Email
+              <input id="enquiry-email" type="email" autocomplete="email" readonly required>
+            </label>
+            <label class="enquiry-form-wide">
+              Program of interest
+              <select name="program" required>
+                <option value="">Select a program</option>
+                <option value="teaching-foundations">Teaching foundations</option>
+                <option value="classroom-practice">Classroom practice</option>
+                <option value="professional-growth">Professional growth</option>
+                <option value="other">Other / not sure yet</option>
+              </select>
+            </label>
+            <label class="enquiry-form-wide">
+              What would you like to know?
+              <textarea name="feedback" rows="4" maxlength="2000" placeholder="Share a question or tell us what you’re looking for."></textarea>
+            </label>
+            <label class="enquiry-consent enquiry-form-wide">
+              <input name="consent" type="checkbox" value="yes" required>
+              <span>I agree to Vidya Setu Education using these details to respond to my enquiry.</span>
+            </label>
+            <button class="button button-primary enquiry-submit enquiry-form-wide" id="enquiry-submit" type="submit" disabled>Send enquiry <span aria-hidden="true">→</span></button>
+            <p class="enquiry-result enquiry-form-wide" id="enquiry-result" role="status" aria-live="polite"></p>
+          </form>
         </div>
         <div class="contact-decoration" aria-hidden="true">✳</div>
       </section>

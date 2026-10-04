@@ -778,6 +778,126 @@ h2 {
   font-size: 13px;
 }
 
+.enquiry-auth {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-bottom: 18px;
+}
+
+.enquiry-auth p,
+.enquiry-result {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.enquiry-auth .button {
+  min-height: 40px;
+}
+
+.enquiry-auth .text-link {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.enquiry-form {
+  display: grid;
+  max-width: 650px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 auto;
+  padding: 24px;
+  border: 1px solid rgb(29 93 67 / 12%);
+  border-radius: 5px;
+  background: var(--paper);
+  text-align: left;
+}
+
+.enquiry-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.enquiry-form input:not([type="checkbox"]),
+.enquiry-form select,
+.enquiry-form textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.enquiry-form textarea {
+  min-height: 105px;
+  resize: vertical;
+}
+
+.enquiry-form input:focus-visible,
+.enquiry-form select:focus-visible,
+.enquiry-form textarea:focus-visible {
+  outline: 3px solid #e6a640;
+  outline-offset: 2px;
+}
+
+.enquiry-form input[readonly] {
+  background: #f4f6ef;
+}
+
+.enquiry-form-wide {
+  grid-column: 1 / -1;
+}
+
+.enquiry-form .enquiry-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--muted);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.enquiry-consent input {
+  margin: 3px 0 0;
+  accent-color: var(--green);
+}
+
+.enquiry-submit {
+  justify-self: start;
+  border: 0;
+  cursor: pointer;
+}
+
+.enquiry-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.enquiry-result:empty {
+  display: none;
+}
+
+.enquiry-result[data-state="error"] {
+  color: #a33131;
+}
+
+.enquiry-result[data-state="success"] {
+  color: var(--green);
+}
+
 .contact-decoration {
   position: absolute;
   top: 20px;
@@ -1005,6 +1125,21 @@ h2 {
     top: 60px;
     right: -70px;
     font-size: 160px;
+  }
+
+  .enquiry-form {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .enquiry-form {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+
+  .enquiry-form-wide {
+    grid-column: auto;
   }
 }
 
