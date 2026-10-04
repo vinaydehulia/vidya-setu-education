@@ -52,7 +52,8 @@ exports.submitFeedback = onCall(async (request) => {
     throw new HttpsError("failed-precondition", "Consent is required to submit an enquiry.");
   }
 
-  const fullName = requireText(request.data?.fullName, "name", 100);
+  const firstName = requireText(request.data?.firstName, "first name", 100);
+  const surname = requireText(request.data?.surname, "surname", 100);
   const phoneNumber = validatePhoneNumber(request.data?.phoneNumber);
   const program = requireText(request.data?.program, "program", 40);
   if (!allowedPrograms.has(program)) {
@@ -74,21 +75,23 @@ exports.submitFeedback = onCall(async (request) => {
   }
 
   const submissionId = randomUUID();
+  const query = [
+    `Program of interest: ${program}`,
+    message
+  ].filter(Boolean).join("\n\n");
   const row = {
-    submission_id: submissionId,
-    full_name: fullName,
-    phone_number: phoneNumber,
-    email,
-    program,
-    feedback: message,
-    consent_given: true,
-    created_at: new Date().toISOString()
+    id: submissionId,
+    name: firstName,
+    sirname: surname,
+    phone_no: phoneNumber,
+    email_id: email,
+    Query: query
   };
 
   try {
     await bigQuery
       .dataset(datasetId)
-      .table("user_feedback")
+      .table("vse_feedback_table")
       .insert([{ insertId: submissionId, json: row }]);
   } catch (error) {
     console.error("Could not write enquiry to BigQuery.", error);

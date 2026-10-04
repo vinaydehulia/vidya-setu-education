@@ -73,22 +73,20 @@ The included `firebase.json` serves this folder as the static site. Add your pho
 The form requires a Firebase project with billing enabled: deploying Firebase Cloud Functions requires the Blaze plan, and BigQuery streaming inserts are not available in the no-billing sandbox/free tier. BigQuery storage and writes can incur usage-based charges. Review the Google Cloud pricing and quotas before enabling billing.
 
 1. In Firebase Console, enable **Authentication > Sign-in method > Google**. Add the deployed Hosting domain (and any custom domain) to the authorized domains.
-2. In the linked Google Cloud project, enable the BigQuery API and create a dataset. The function and dataset should be in the same project. Create the `user_feedback` table in that dataset with this schema:
+2. In the linked Google Cloud project, enable the BigQuery API and create a dataset. The function and dataset should be in the same project. Create the `vse_feedback_table` table in the `vse_bq_dataset` dataset with this schema:
 
    ```sql
-   CREATE TABLE `PROJECT_ID.DATASET_ID.user_feedback` (
-     submission_id STRING NOT NULL,
-     full_name STRING NOT NULL,
-     phone_number STRING NOT NULL,
-     email STRING NOT NULL,
-     program STRING NOT NULL,
-     feedback STRING,
-     consent_given BOOL NOT NULL,
-     created_at TIMESTAMP NOT NULL
+   CREATE TABLE `vidya-setu-education.vse_bq_dataset.vse_feedback_table` (
+     id STRING,
+     name STRING,
+     sirname STRING,
+     phone_no STRING,
+     email_id STRING,
+     Query STRING
    );
    ```
 
-   Replace `PROJECT_ID` and `DATASET_ID` with the linked Firebase project ID and your chosen BigQuery dataset ID. The dataset name is supplied as the `BIGQUERY_DATASET` parameter when the function is deployed.
+   The function writes the form's first name, surname, phone, and signed-in email to their matching columns. It combines the selected program and optional message into `Query`. If using a different project or dataset, adjust the table identifier and the `BIGQUERY_DATASET` function parameter.
 3. Grant the deployed function's runtime service account the **BigQuery Data Editor** role on the dataset. Gen 2 functions use a runtime service account; check the function's runtime settings in Google Cloud Console to confirm which account is in use.
 4. Using Node.js 22 and the Firebase CLI, install the function dependencies and deploy the site and function:
 
@@ -100,7 +98,7 @@ The form requires a Firebase project with billing enabled: deploying Firebase Cl
    ```
 
    On first deployment, provide your dataset ID when prompted for `BIGQUERY_DATASET`.
-5. Test on the Firebase Hosting URL by signing in with Google, completing the enquiry form, and confirming the row appears in `DATASET_ID.user_feedback`.
+5. Test on the Firebase Hosting URL by signing in with Google, completing the enquiry form, and confirming the row appears in `vse_bq_dataset.vse_feedback_table`.
 
 The existing GitHub Actions workflow deploys Hosting only. Deploy Cloud Functions with the Firebase CLI after changing `functions/`; CI deployment for functions needs separate setup and appropriate Google Cloud IAM permissions. Serving the site from a plain local static server does not provide the Firebase reserved SDK initialization endpoints or a deployed function, so form submissions require Firebase Hosting and the deployed backend.
 

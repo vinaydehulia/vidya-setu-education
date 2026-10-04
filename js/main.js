@@ -65,7 +65,7 @@ async function initializeEnquiryForm() {
   }
 
   const auth = window.firebase.auth();
-  const submitFeedback = window.firebase.functions("us-central1").httpsCallable("submitFeedback");
+  const submitFeedback = window.firebase.app().functions("us-central1").httpsCallable("submitFeedback");
 
   auth.onAuthStateChanged((user) => {
     const email = user?.email || "";
@@ -142,7 +142,8 @@ async function initializeEnquiryForm() {
 
     try {
       await submitFeedback({
-        fullName: formData.get("fullName"),
+        firstName: formData.get("firstName"),
+        surname: formData.get("surname"),
         phoneNumber: normalizePhoneNumber(phoneInput.value),
         program: formData.get("program"),
         feedback: formData.get("feedback"),
