@@ -92,28 +92,12 @@ button:focus-visible {
   gap: 10px;
 }
 
-.brand-mark {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  border-radius: 12px 12px 12px 4px;
-  background: var(--green);
-  color: white;
-  font-family: var(--font-heading);
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.brand-name {
-  font-family: var(--font-heading);
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: -0.6px;
-}
-
-.brand-name span {
-  color: var(--green);
+.brand-logo {
+  display: block;
+  width: 128px;
+  height: 76px;
+  object-fit: cover;
+  object-position: center;
 }
 
 .site-navigation {
