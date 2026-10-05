@@ -88,7 +88,7 @@ The form requires a Firebase project with billing enabled: deploying Firebase Cl
    ```
 
    The function writes the form's first name, surname, phone, and signed-in email to their matching columns. It combines the selected program and optional message into `Query`, and stores the submission timestamp in `Time`. BigQuery stores `TIMESTAMP` as an absolute instant; to display it in IST, use `FORMAT_TIMESTAMP('%F %T', Time, 'Asia/Kolkata')`. If using a different project or dataset, adjust the table identifier and the `BIGQUERY_DATASET` function parameter.
-3. Grant the deployed function's runtime service account the **BigQuery Data Editor** role on the dataset and **BigQuery Job User** role on the project. Gen 2 functions use a runtime service account; check the function's runtime settings in Google Cloud Console to confirm which account is in use. The admin page is visible to `neelam.dehulia@gmail.com` and loads every enquiry ordered by `Time` newest first; the callable function also checks this verified email on the server before reading BigQuery.
+3. Grant the deployed function's runtime service account the **BigQuery Data Editor** role on the dataset and **BigQuery Job User** role on the project. Gen 2 functions use a runtime service account; check the function's runtime settings in Google Cloud Console to confirm which account is in use. The admin page is visible to `neelam.dehulia@gmail.com` and loads up to the latest 50 enquiries ordered by `Time` newest first; the callable function also checks this verified email on the server before reading BigQuery.
 4. Using Node.js 22 and the Firebase CLI, install the function dependencies and deploy the site and function:
 
    ```sh

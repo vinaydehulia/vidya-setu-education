@@ -149,6 +149,7 @@ exports.getFeedback = onCall(async (request) => {
           FORMAT_TIMESTAMP('%Y-%m-%dT%H:%M:%E6SZ', Time, 'UTC') AS Time
         FROM \`vidya-setu-education.${datasetId}.vse_feedback_table\`
         ORDER BY Time DESC
+        LIMIT 50
       `
     });
 

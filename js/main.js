@@ -212,10 +212,12 @@ async function loadAdminFeedback(getFeedback, auth) {
     }
 
     if (rows.length === 0) {
+      adminFeedbackRows.replaceChildren();
       adminStatus.textContent = "There are no enquiries yet.";
       return;
     }
 
+    const tableRows = document.createDocumentFragment();
     rows.forEach((row) => {
       const tableRow = document.createElement("tr");
       const values = [
@@ -232,9 +234,10 @@ async function loadAdminFeedback(getFeedback, auth) {
         cell.textContent = value == null ? "" : String(value);
         tableRow.append(cell);
       });
-      adminFeedbackRows.append(tableRow);
+      tableRows.append(tableRow);
     });
-    adminStatus.textContent = `${rows.length} ${rows.length === 1 ? "enquiry" : "enquiries"} loaded, newest first.`;
+    adminFeedbackRows.replaceChildren(tableRows);
+    adminStatus.textContent = `Showing the latest ${rows.length} ${rows.length === 1 ? "enquiry" : "enquiries"} (up to 50), newest first.`;
   } catch (error) {
     console.error("Could not load admin feedback.", error);
     adminStatus.textContent = "Enquiries could not be loaded. Please reload the page and try again.";
