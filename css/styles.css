@@ -822,6 +822,18 @@ h2 {
   background: var(--cream);
 }
 
+.admin-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.admin-actions .section-copy {
+  margin: 0;
+}
+
 .admin-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);

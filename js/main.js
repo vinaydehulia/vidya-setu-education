@@ -13,6 +13,7 @@ const adminNavigationLink = document.querySelector("#admin-navigation-link");
 const adminSection = document.querySelector("#admin");
 const adminStatus = document.querySelector("#admin-status");
 const adminFeedbackRows = document.querySelector("#admin-feedback-rows");
+const adminReloadButton = document.querySelector("#admin-reload");
 const adminEmail = "neelam.dehulia@gmail.com";
 
 if (menuButton && navigation) {
@@ -72,6 +73,14 @@ async function initializeEnquiryForm() {
   const auth = window.firebase.auth();
   const submitFeedback = window.firebase.app().functions("us-central1").httpsCallable("submitFeedback");
   const getFeedback = window.firebase.app().functions("us-central1").httpsCallable("getFeedback");
+
+  if (adminReloadButton instanceof HTMLButtonElement) {
+    adminReloadButton.addEventListener("click", () => {
+      if (auth.currentUser?.email?.toLowerCase() === adminEmail) {
+        void loadAdminFeedback(getFeedback, auth);
+      }
+    });
+  }
 
   auth.onAuthStateChanged((user) => {
     const email = user?.email || "";
@@ -183,8 +192,14 @@ async function loadAdminFeedback(getFeedback, auth) {
     return;
   }
 
+  if (adminReloadButton instanceof HTMLButtonElement && adminReloadButton.disabled) {
+    return;
+  }
+
+  if (adminReloadButton instanceof HTMLButtonElement) {
+    adminReloadButton.disabled = true;
+  }
   adminStatus.textContent = "Loading enquiries…";
-  adminFeedbackRows.replaceChildren();
 
   try {
     const response = await getFeedback();
@@ -223,6 +238,10 @@ async function loadAdminFeedback(getFeedback, auth) {
   } catch (error) {
     console.error("Could not load admin feedback.", error);
     adminStatus.textContent = "Enquiries could not be loaded. Please reload the page and try again.";
+  } finally {
+    if (adminReloadButton instanceof HTMLButtonElement) {
+      adminReloadButton.disabled = false;
+    }
   }
 }
 
