@@ -9,6 +9,11 @@ const googleSignIn = document.querySelector("#google-sign-in");
 const googleSignOut = document.querySelector("#google-sign-out");
 const enquirySubmit = document.querySelector("#enquiry-submit");
 const enquiryResult = document.querySelector("#enquiry-result");
+const adminNavigationLink = document.querySelector("#admin-navigation-link");
+const adminSection = document.querySelector("#admin");
+const adminStatus = document.querySelector("#admin-status");
+const adminFeedbackRows = document.querySelector("#admin-feedback-rows");
+const adminEmail = "neelam.dehulia@gmail.com";
 
 if (menuButton && navigation) {
   menuButton.addEventListener("click", () => {
@@ -66,9 +71,11 @@ async function initializeEnquiryForm() {
 
   const auth = window.firebase.auth();
   const submitFeedback = window.firebase.app().functions("us-central1").httpsCallable("submitFeedback");
+  const getFeedback = window.firebase.app().functions("us-central1").httpsCallable("getFeedback");
 
   auth.onAuthStateChanged((user) => {
     const email = user?.email || "";
+    const isAdmin = email.toLowerCase() === adminEmail;
     enquiryEmail.value = email;
     enquiryEmail.disabled = !email;
     enquiryAuthStatus.textContent = email
@@ -77,6 +84,17 @@ async function initializeEnquiryForm() {
     googleSignIn.hidden = Boolean(email);
     googleSignOut.hidden = !email;
     enquirySubmit.disabled = !email;
+    if (adminNavigationLink instanceof HTMLAnchorElement) {
+      adminNavigationLink.hidden = !isAdmin;
+    }
+    if (adminSection instanceof HTMLElement) {
+      adminSection.hidden = !isAdmin;
+    }
+    if (isAdmin) {
+      void loadAdminFeedback(getFeedback, auth);
+    } else if (adminFeedbackRows instanceof HTMLElement) {
+      adminFeedbackRows.replaceChildren();
+    }
 
     if (!email) {
       setEnquiryResult("", "");
@@ -158,6 +176,67 @@ async function initializeEnquiryForm() {
       enquirySubmit.disabled = !auth.currentUser?.email;
     }
   });
+}
+
+async function loadAdminFeedback(getFeedback, auth) {
+  if (!(adminStatus instanceof HTMLElement) || !(adminFeedbackRows instanceof HTMLElement)) {
+    return;
+  }
+
+  adminStatus.textContent = "Loading enquiries…";
+  adminFeedbackRows.replaceChildren();
+
+  try {
+    const response = await getFeedback();
+    if (auth.currentUser?.email?.toLowerCase() !== adminEmail) {
+      return;
+    }
+    const rows = response.data;
+    if (!Array.isArray(rows)) {
+      throw new Error("The admin feedback response has an invalid format.");
+    }
+
+    if (rows.length === 0) {
+      adminStatus.textContent = "There are no enquiries yet.";
+      return;
+    }
+
+    rows.forEach((row) => {
+      const tableRow = document.createElement("tr");
+      const values = [
+        formatAdminTimestamp(row.Time),
+        row.name,
+        row.sirname,
+        row.phone_no,
+        row.email_id,
+        row.Query,
+        row.id
+      ];
+      values.forEach((value) => {
+        const cell = document.createElement("td");
+        cell.textContent = value == null ? "" : String(value);
+        tableRow.append(cell);
+      });
+      adminFeedbackRows.append(tableRow);
+    });
+    adminStatus.textContent = `${rows.length} ${rows.length === 1 ? "enquiry" : "enquiries"} loaded, newest first.`;
+  } catch (error) {
+    console.error("Could not load admin feedback.", error);
+    adminStatus.textContent = "Enquiries could not be loaded. Please reload the page and try again.";
+  }
+}
+
+function formatAdminTimestamp(value) {
+  const timestamp = new Date(value);
+  if (Number.isNaN(timestamp.getTime())) {
+    return value == null ? "" : String(value);
+  }
+
+  return new Intl.DateTimeFormat("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    timeZone: "Asia/Kolkata"
+  }).format(timestamp);
 }
 
 async function loadGallery() {

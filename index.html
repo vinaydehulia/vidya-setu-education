@@ -32,6 +32,7 @@
           <a href="#about">About us</a>
           <a href="#learning">Programs</a>
           <a href="#gallery">Gallery</a>
+          <a href="#admin" id="admin-navigation-link" hidden>Admin</a>
           <a class="nav-cta" href="#contact">Get in touch <span aria-hidden="true">↗</span></a>
         </nav>
       </div>
@@ -138,6 +139,34 @@
             <p class="section-copy">A glimpse of our workshops, shared ideas, and teaching community. Photos in the images folder appear here automatically.</p>
           </div>
           <div class="gallery-grid" id="gallery-grid"></div>
+        </div>
+      </section>
+
+      <section class="admin-section section-pad" id="admin" aria-labelledby="admin-heading" hidden>
+        <div class="container">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Administrator</p>
+              <h2 id="admin-heading">Enquiry<br><span>submissions.</span></h2>
+            </div>
+            <p class="section-copy" id="admin-status" role="status" aria-live="polite">Loading enquiries…</p>
+          </div>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th scope="col">Time (IST)</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Surname</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Query</th>
+                  <th scope="col">ID</th>
+                </tr>
+              </thead>
+              <tbody id="admin-feedback-rows"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 

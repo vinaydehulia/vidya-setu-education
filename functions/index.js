@@ -116,3 +116,56 @@ exports.submitFeedback = onCall(async (request) => {
 
   return { success: true };
 });
+
+exports.getFeedback = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Sign in before viewing enquiries.");
+  }
+
+  const email = request.auth.token.email;
+  if (
+    typeof email !== "string" ||
+    email.toLowerCase() !== "neelam.dehulia@gmail.com" ||
+    request.auth.token.email_verified !== true
+  ) {
+    throw new HttpsError("permission-denied", "You are not authorized to view enquiries.");
+  }
+
+  const datasetId = bigQueryDataset.value();
+  if (!/^[A-Za-z0-9_]{1,1024}$/.test(datasetId)) {
+    throw new HttpsError("failed-precondition", "The BigQuery dataset is not configured correctly.");
+  }
+
+  try {
+    const [rows] = await bigQuery.query({
+      query: `
+        SELECT
+          id,
+          name,
+          sirname,
+          phone_no,
+          email_id,
+          Query,
+          FORMAT_TIMESTAMP('%Y-%m-%dT%H:%M:%E6SZ', Time, 'UTC') AS Time
+        FROM \`vidya-setu-education.${datasetId}.vse_feedback_table\`
+        ORDER BY Time DESC
+      `
+    });
+
+    return rows.map((row) => ({
+      id: row.id == null ? "" : String(row.id),
+      name: row.name == null ? "" : String(row.name),
+      sirname: row.sirname == null ? "" : String(row.sirname),
+      phone_no: row.phone_no == null ? "" : String(row.phone_no),
+      email_id: row.email_id == null ? "" : String(row.email_id),
+      Query: row.Query == null ? "" : String(row.Query),
+      Time: row.Time == null ? "" : String(row.Time)
+    }));
+  } catch (error) {
+    console.error("Could not read enquiries from BigQuery.", {
+      code: error?.code,
+      message: error?.message
+    });
+    throw new HttpsError("internal", "Enquiries could not be loaded. Please try again.");
+  }
+});

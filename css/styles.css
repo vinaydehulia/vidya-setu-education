@@ -137,6 +137,10 @@ button:focus-visible {
   color: var(--green);
 }
 
+[hidden] {
+  display: none !important;
+}
+
 .menu-toggle {
   display: none;
 }
@@ -812,6 +816,50 @@ h2 {
   border-radius: 5px;
   background: var(--paper);
   text-align: left;
+}
+
+.admin-section {
+  background: var(--cream);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+.admin-table th,
+.admin-table td {
+  max-width: 280px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.admin-table th {
+  position: sticky;
+  top: 0;
+  background: #f3f1e8;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.admin-table td {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .enquiry-form label {
