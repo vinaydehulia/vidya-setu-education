@@ -12,7 +12,7 @@ const allowedPrograms = new Set([
   "other"
 ]);
 
-function requireText(value, field, maxLength) {
+  requireText(value, field, maxLength) {
   if (typeof value !== "string") {
     throw new HttpsError("invalid-argument", `The ${field} field is required.`);
   }
